@@ -1,0 +1,24 @@
+# Confidence Engine & Routing Thresholds Configuration
+
+routing:
+  auto_approval:
+    min_composite_confidence: 0.92
+    min_field_confidence: 0.85
+    require_zero_validation_errors: true
+    require_valid_digital_signature_for_xml: true
+  manual_review:
+    min_composite_confidence: 0.65 # Invoices below 0.65 are flagged for intensive review
+    auto_escalation_rules:
+      - "TAX_ID_MISMATCH"
+      - "ARITHMETIC_MISMATCH"
+      - "DUPLICATE_SUSPICION"
+      - "SELLER_INACTIVE_TAX_AUTHORITY"
+
+field_weights:
+  metadata.invoice_number: 0.15
+  metadata.invoice_series: 0.10
+  metadata.issue_date: 0.10
+  seller.tax_id: 0.20
+  summary.total_amount: 0.20
+  summary.vat_amount: 0.10
+  items: 0.15

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:element name="HDon">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="DLHDon">
+          <xs:complexType>
+            <xs:sequence>
+              <!-- Invoice Metadata / Thong tin hoa don -->
+              <xs:element name="TTChung">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="KHMSHDon" type="xs:string" minOccurs="0"/>
+                    <xs:element name="KHHDon" type="xs:string"/>
+                    <xs:element name="SHDon" type="xs:string"/>
+                    <xs:element name="NLap" type="xs:date"/>
+                    <xs:element name="DVTTe" type="xs:string"/>
+                    <xs:element name="TGia" type="xs:decimal" minOccurs="0"/>
+                    <xs:element name="HTTToan" type="xs:string" minOccurs="0"/>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <!-- Seller / Nguoi ban -->
+              <xs:element name="NDHDon">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="NBan">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="Ten" type="xs:string"/>
+                          <xs:element name="MST" type="xs:string"/>
+                          <xs:element name="DChi" type="xs:string"/>
+                          <xs:element name="SDThoai" type="xs:string" minOccurs="0"/>
+                          <xs:element name="STKNHang" type="xs:string" minOccurs="0"/>
+                          <xs:element name="TNHang" type="xs:string" minOccurs="0"/>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <!-- Buyer / Nguoi mua -->
+                    <xs:element name="NMua">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="Ten" type="xs:string" minOccurs="0"/>
+                          <xs:element name="MST" type="xs:string" minOccurs="0"/>
+                          <xs:element name="DChi" type="xs:string" minOccurs="0"/>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <!-- Line Items / Danh sach hang hoa dich vu -->
+                    <xs:element name="DSHHDVu">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="HHDVu" maxOccurs="unbounded">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element name="STT" type="xs:integer"/>
+                                <xs:element name="THHDVu" type="xs:string"/>
+                                <xs:element name="DVTinh" type="xs:string" minOccurs="0"/>
+                                <xs:element name="SLuong" type="xs:decimal" minOccurs="0"/>
+                                <xs:element name="DGia" type="xs:decimal" minOccurs="0"/>
+                                <xs:element name="TLCKhau" type="xs:decimal" minOccurs="0"/>
+                                <xs:element name="STCKhau" type="xs:decimal" minOccurs="0"/>
+                                <xs:element name="ThTien" type="xs:decimal"/>
+                                <xs:element name="TSuat" type="xs:string" minOccurs="0"/>
+                              </xs:sequence>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <!-- Payment & Totals / Tong hop thanh toan -->
+                    <xs:element name="TToan">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="TgTCThue" type="xs:decimal"/>
+                          <xs:element name="TgTThue" type="xs:decimal"/>
+                          <xs:element name="TgTTTBSo" type="xs:decimal"/>
+                          <xs:element name="TgTTTBChu" type="xs:string" minOccurs="0"/>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute name="Id" type="xs:string"/>
+          </xs:complexType>
+        </xs:element>
+        <!-- Digital Signature -->
+        <xs:element name="DSCKS" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:any processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

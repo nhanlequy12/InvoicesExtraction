@@ -1,0 +1,110 @@
+# ==============================================================================
+# DETERMINISTIC VALIDATION RULES CONFIGURATION (ND123/2020 & TT78/2021)
+# ==============================================================================
+
+version: "1.0.0"
+regulation_reference: "Nghi dinh 123/2020/ND-CP & Thong tu 78/2021/TT-BTC"
+
+layers:
+  # Layer 1: Schema Completeness
+  schema:
+    enabled: true
+    mandatory_fields:
+      - field: "metadata.invoice_number"
+        severity: "ERROR"
+        message: "Invoice number is mandatory"
+      - field: "metadata.invoice_series"
+        severity: "ERROR"
+        message: "Invoice series is mandatory"
+      - field: "metadata.issue_date"
+        severity: "ERROR"
+        message: "Issue date is mandatory"
+      - field: "seller.tax_id"
+        severity: "ERROR"
+        message: "Seller Tax ID is mandatory"
+      - field: "seller.name"
+        severity: "ERROR"
+        message: "Seller Name is mandatory"
+      - field: "buyer.name"
+        severity: "WARNING"
+        message: "Buyer Name should be specified"
+      - field: "items"
+        severity: "ERROR"
+        message: "Invoice must contain at least one line item"
+      - field: "summary.total_amount"
+        severity: "ERROR"
+        message: "Total invoice amount is mandatory"
+
+  # Layer 2: Format & Syntactic Integrity
+  format:
+    enabled: true
+    rules:
+      - rule_id: "FMT_TAX_ID_SELLER"
+        field: "seller.tax_id"
+        regex: "^[0-9]{10}(-[0-9]{3})?$"
+        severity: "ERROR"
+        message: "Seller Tax ID must be 10 or 13 digits (format: XXXXXXXXXX or XXXXXXXXXX-XXX)"
+      - rule_id: "FMT_TAX_ID_BUYER"
+        field: "buyer.tax_id"
+        regex: "^[0-9]{10}(-[0-9]{3})?$"
+        allow_empty: true
+        severity: "WARNING"
+        message: "Buyer Tax ID format is invalid"
+      - rule_id: "FMT_INVOICE_SERIES"
+        field: "metadata.invoice_series"
+        regex: "^[12C][0-9]{2}[A-Z]{2,4}$"
+        severity: "WARNING"
+        message: "Invoice series does not conform to Circular 78 pattern (e.g., 1C24TKK)"
+      - rule_id: "FMT_INVOICE_NUMBER"
+        field: "metadata.invoice_number"
+        regex: "^[0-9]{1,8}$"
+        severity: "ERROR"
+        message: "Invoice number must be up to 8 numeric digits"
+      - rule_id: "FMT_CURRENCY"
+        field: "summary.currency"
+        allowed_values: ["VND", "USD", "EUR", "JPY", "SGD"]
+        default: "VND"
+        severity: "WARNING"
+        message: "Unrecognized currency code"
+
+  # Layer 3: Financial & Arithmetic Precision
+  arithmetic:
+    enabled: true
+    precision: "Decimal"
+    tolerance:
+      VND: 1.00 # 1 VND tolerance for rounding
+      USD: 0.01 # 1 Cent tolerance
+    checks:
+      - check_id: "MATH_LINE_TOTAL"
+        description: "Line Total = Quantity * Unit Price - Discount"
+        severity: "ERROR"
+        message: "Line item calculation mismatch"
+      - check_id: "MATH_SUBTOTAL_SUM"
+        description: "Sum of line items amount before tax == summary.subtotal"
+        severity: "ERROR"
+        message: "Sum of item subtotals does not equal invoice subtotal"
+      - check_id: "MATH_VAT_SUM"
+        description: "Sum of line items VAT amounts == summary.vat_amount"
+        severity: "ERROR"
+        message: "Sum of item VAT amounts does not equal invoice VAT amount"
+      - check_id: "MATH_TOTAL_AMOUNT"
+        description: "Subtotal + VAT amount == summary.total_amount"
+        severity: "ERROR"
+        message: "Subtotal + VAT does not equal total amount"
+
+  # Layer 4: Cross-field Logic
+  cross_field:
+    enabled: true
+    checks:
+      - check_id: "XFIELD_VAT_RATE_CALC"
+        description: "VAT amount matches Subtotal * (VAT Rate / 100)"
+        severity: "WARNING"
+        message: "VAT amount deviates from expected rate calculation"
+      - check_id: "XFIELD_ISSUE_DATE_PAST_NOT_FUTURE"
+        description: "Issue date cannot be in the future"
+        severity: "ERROR"
+        message: "Invoice issue date is in the future"
+      - check_id: "XFIELD_SELLER_BUYER_DIFFERENT"
+        description: "Seller Tax ID must not match Buyer Tax ID"
+        severity: "WARNING"
+        message: "Seller Tax ID and Buyer Tax ID are identical"

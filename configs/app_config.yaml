@@ -1,0 +1,60 @@
+system:
+  name: "AI Smart Invoice Processing Platform"
+  version: "1.0.0"
+  description: "Enterprise Vietnamese E-Invoice Automated Processing, Validation & Accounting Integration"
+  default_timezone: "Asia/Ho_Chi_Minh"
+
+ingestion:
+  supported_formats:
+    - "xml"
+    - "pdf"
+    - "png"
+    - "jpg"
+    - "jpeg"
+    - "tiff"
+  max_file_size_bytes: 26214400 # 25 MB
+  pair_matching_window_seconds: 300 # Detect XML + PDF uploaded within 5 mins
+
+classifier:
+  prefer_xml_over_pdf: true
+  verify_signature_on_xml: true
+  enable_ai_visual_crosscheck_on_xml: false
+
+pipelines:
+  xml:
+    enforce_schema_validation: true
+    enforce_signature_verification: true
+    allowed_signature_algorithms:
+      - "http://www.w3.org/2000/09/xmldsig#rsa-sha1"
+      - "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"
+  ai:
+    preprocessing:
+      target_dpi: 300
+      auto_deskew: true
+      auto_denoise: true
+    ocr:
+      engine: "paddleocr"
+      lang: "vi"
+      use_gpu: false
+    layout:
+      engine: "layoutlmv3"
+      confidence_threshold: 0.80
+    table:
+      engine: "table_transformer"
+      max_columns: 15
+    extraction:
+      mode: "hybrid" # layoutlm + regex fallback + vlm fallback
+      enable_vlm_fallback: false
+
+validation:
+  rules_config_path: "configs/rules/validation_rules.yaml"
+  tax_rates_config_path: "configs/rules/tax_rates.yaml"
+  thresholds_config_path: "configs/rules/thresholds.yaml"
+
+integration:
+  erp:
+    default_provider: "misa" # sap, bravo, misa, fast, erpnext
+    timeout_seconds: 10
+  export:
+    storage_folder: "data/exports"
+    default_formats: ["xlsx", "json"]

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<HDon>
+  <DLHDon Id="data">
+    <TTChung>
+      <KHMSHDon>1</KHMSHDon>
+      <KHHDon>1C24TKK</KHHDon>
+      <SHDon>00001234</SHDon>
+      <NLap>2026-09-28</NLap>
+      <DVTTe>VND</DVTTe>
+      <TGia>1</TGia>
+      <HTTToan>TM/CK</HTTToan>
+      <MCCQT>TCT-123456789</MCCQT>
+    </TTChung>
+    <NDHDon>
+      <NBan>
+        <Ten>CONG TY TNHH CONG NGHE ABC VIET NAM</Ten>
+        <MST>0100109106</MST>
+        <DChi>So 123 Pho Hue, Quan Hai Ba Trung, Ha Noi</DChi>
+        <SDThoai>02438888888</SDThoai>
+        <STKNHang>19020000000001</STKNHang>
+        <TNHang>Techcombank</TNHang>
+      </NBan>
+      <NMua>
+        <Ten>CONG TY CO PHAN PHAN MEM KHOA HOC</Ten>
+        <MST>0312345678</MST>
+        <DChi>Quan 1, TP Ho Chi Minh</DChi>
+      </NMua>
+      <DSHHDVu>
+        <HHDVu>
+          <STT>1</STT>
+          <THHDVu>May tinh xach tay Dell Latitude</THHDVu>
+          <DVTinh>Cai</DVTinh>
+          <SLuong>2</SLuong>
+          <DGia>25000000</DGia>
+          <STCKhau>0</STCKhau>
+          <ThTien>50000000</ThTien>
+          <TSuat>10%</TSuat>
+        </HHDVu>
+      </DSHHDVu>
+      <TToan>
+        <TgTCThue>50000000</TgTCThue>
+        <TgTThue>5000000</TgTThue>
+        <TgTTTBSo>55000000</TgTTTBSo>
+        <TgTTTBChu>Nam muoi lam trieu dong</TgTTTBChu>
+      </TToan>
+    </NDHDon>
+  </DLHDon>
+  <DSCKS>
+    <Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
+      <SignedInfo>
+        <CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
+        <SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
+      </SignedInfo>
+      <SignatureValue>MOCK_SIGNATURE_VALUE</SignatureValue>
+      <KeyInfo>
+        <X509Data>
+          <X509Certificate>MOCK_BASE64_CERTIFICATE</X509Certificate>
+        </X509Data>
+      </KeyInfo>
+    </Signature>
+  </DSCKS>
+</HDon>
