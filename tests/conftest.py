@@ -76,12 +76,30 @@ def sample_xml_bytes() -> bytes:
 
 @pytest.fixture
 def sample_pdf_bytes() -> bytes:
-    return b"%PDF-1.4\n%mock invoice pdf binary content\n%%EOF"
+    import io
+    from PIL import Image, ImageDraw
+    img = Image.new("RGB", (800, 1000), color=(255, 255, 255))
+    d = ImageDraw.Draw(img)
+    d.text((50, 50), "HOA DON GIA TRI GIA TANG", fill=(0, 0, 0))
+    d.text((50, 100), "So hoa don: 0001234", fill=(0, 0, 0))
+    d.line([(50, 150), (750, 150)], fill=(0, 0, 0), width=2)
+    buf = io.BytesIO()
+    img.save(buf, format="PDF")
+    return buf.getvalue()
 
 
 @pytest.fixture
 def sample_image_bytes() -> bytes:
-    return b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDRmock png binary content"
+    import io
+    from PIL import Image, ImageDraw
+    img = Image.new("RGB", (800, 1000), color=(255, 255, 255))
+    d = ImageDraw.Draw(img)
+    d.text((50, 50), "HOA DON GIA TRI GIA TANG", fill=(0, 0, 0))
+    d.text((50, 100), "So hoa don: 0001234", fill=(0, 0, 0))
+    d.line([(50, 150), (750, 150)], fill=(0, 0, 0), width=2)
+    buf = io.BytesIO()
+    img.save(buf, format="PNG")
+    return buf.getvalue()
 
 
 @pytest.fixture

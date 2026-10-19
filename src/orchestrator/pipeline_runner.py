@@ -11,7 +11,7 @@ from src.ingestion.base import RawDocument
 from src.integration.erp.exporter import ERPIntegrationEngine
 from src.normalization.normalizer import InvoiceNormalizer
 from src.normalization.schemas import NormalizedInvoice
-from src.pipelines.ai.extraction.field_extractor import AIFieldExtractor
+from src.pipelines.ai.extraction.field_extractor import AIFieldExtractor, RawAIExtractionResult
 from src.pipelines.ai.layout.detector import LayoutDetector
 from src.pipelines.ai.ocr.engine import OCREngine
 from src.pipelines.ai.preprocessing.preprocessor import DocumentPreprocessor
@@ -26,11 +26,14 @@ class ProcessingPipelineResult:
     document_id: str
     file_name: str
     pipeline_type: str
-    normalized_invoice: NormalizedInvoice
-    validation_report: ValidationReport
-    confidence_evaluation: ConfidenceEvaluationResult
-    routing_decision: RoutingDecision
+    normalized_invoice: Optional[NormalizedInvoice] = None
+    validation_report: Optional[ValidationReport] = None
+    confidence_evaluation: Optional[ConfidenceEvaluationResult] = None
+    routing_decision: Optional[RoutingDecision] = None
     erp_post_result: Optional[Dict[str, Any]] = None
+    raw_ai_result: Optional[RawAIExtractionResult] = None
+    full_text: Optional[str] = None
+    regions: Optional[List[Any]] = None
 
 
 class InvoicePipelineOrchestrator:
@@ -100,14 +103,59 @@ class InvoicePipelineOrchestrator:
             regions = self.layout_detector.detect_regions(ocr_res)
             raw_ai_result = self.field_extractor.extract(ocr_res, regions)
 
-            normalized_invoice = self.normalizer.normalize_from_ai(
-                raw_ai=raw_ai_result,
+            logger.info(f"=== AI Extraction Completed for {raw_doc.file_name} ===")
+            logger.info(f"Full Text Extracted:\n{ocr_res.full_text}")
+            logger.info(f"Extracted Table ({len(raw_ai_result.line_items)} line items):")
+            for item in raw_ai_result.line_items:
+                logger.info(
+                    f"  Line {item.line_number}: {item.description} | "
+                    f"Qty: {item.quantity} | Price: {item.unit_price} | Amount: {item.amount_before_tax}"
+                )
+            logger.info(
+                f"Extracted Fields: "
+                f"{ {k: v.value for k, v in raw_ai_result.fields.items() if v.value is not None} }"
+            )
+
+            # =========================================================================
+            # Commented out normalization, validation, confidence evaluation, ERP posting,
+            # and DB persistence for AI Document Processing per user instruction:
+            # =========================================================================
+            # normalized_invoice = self.normalizer.normalize_from_ai(
+            #     raw_ai=raw_ai_result,
+            #     document_id=raw_doc.document_id,
+            #     file_name=raw_doc.file_name,
+            #     source=raw_doc.source.value,
+            #     doc_format=classification.detected_format.value,
+            #     file_hash=file_hash,
+            #     storage_path=storage_path
+            # )
+            # validation_report = self.validation_engine.validate(normalized_invoice)
+            # confidence_eval = self.confidence_engine.evaluate(normalized_invoice, validation_report)
+            # erp_result = None
+            # if confidence_eval.decision == RoutingDecision.APPROVED:
+            #     erp_result = self.erp_engine.post_to_erp(normalized_invoice)
+            # else:
+            #     self.review_manager.assign_for_review(raw_doc.document_id)
+            # if db:
+            #     repo = InvoiceRepository(db)
+            #     repo.save_invoice_transactional(
+            #         invoice=normalized_invoice,
+            #         validation_report=validation_report,
+            #         routing_status=confidence_eval.decision.value
+            #     )
+
+            return ProcessingPipelineResult(
                 document_id=raw_doc.document_id,
                 file_name=raw_doc.file_name,
-                source=raw_doc.source.value,
-                doc_format=classification.detected_format.value,
-                file_hash=file_hash,
-                storage_path=storage_path
+                pipeline_type=classification.target_pipeline.value,
+                normalized_invoice=None,
+                validation_report=None,
+                confidence_evaluation=None,
+                routing_decision=None,
+                erp_post_result=None,
+                raw_ai_result=raw_ai_result,
+                full_text=ocr_res.full_text,
+                regions=regions,
             )
 
         # Step 4: Validation Engine (Rules + External Verify + Anomaly Detection)
